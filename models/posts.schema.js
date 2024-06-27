@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
-import { commentSchema } from './comments.schema.js';
+import {commentSchema} from './comment.schema.js';
+import { User } from './users.schema.js';
+
 export const postSchema = new mongoose.Schema({
   authorId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -24,7 +26,7 @@ export const postSchema = new mongoose.Schema({
   comments: [commentSchema],
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: User
   }]
 });
 

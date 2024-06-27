@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 process.env.JWT_SECRET = 'anc';
 class UsersService {
+
   async registerUser(userData) {
     try {
       const newUser = new User(userData);
@@ -25,10 +26,11 @@ class UsersService {
         };
       }
 
-      console.error('Error saving user:', error);
-        return {  status: 400, 
+        console.error('Error saving user:', error);
+        return {  
+                status: 400, 
                 data: { error: 'Error registering user' } 
-        };
+          };
     }
   }
 
@@ -40,13 +42,13 @@ class UsersService {
       if (!user) {
         return { status: 404, data: { error: 'User not found' } };
       }
-      
+      console.log('pass',user.password ,'===', 'userpass', password)
       const isMatch = await bcrypt.compare(password,user.password)
       if (!isMatch) {
         return { status: 401, data: { error: 'Invalid password' } };
       }
   
-      const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
+      const token = jwt.sign({ _id: user._id.toString(), email: user.email }, process.env.JWT_SECRET);
       return {
         status: 200,
         data: {
@@ -59,6 +61,51 @@ class UsersService {
     }
   }
 
+  async getUserByEmail(email) {
+    try {
+      const user = await User.findOne({ email });
+      
+      if (!user) {
+        return { status: 404, data: { error: 'User not found' } };
+      }
+
+      return {
+        status: 200,
+        data: {
+          user: user
+        },
+      };
+
+    } catch (error) {
+      console.error('Error saving user:', error);
+        return {  status: 400, 
+                data: { error: 'Error getting the user' } 
+        };
+    }
+  }
+
+  async getUserByUsername(username) {
+    try {
+      const user = await User.findOne({ username });
+      
+      if (!user) {
+        return { status: 404, data: { error: 'User not found' } };
+      }
+
+      return {
+        status: 200,
+        data: {
+          user: user
+        },
+      };
+
+    } catch (error) {
+      console.error('Error saving user:', error);
+        return {  status: 400, 
+                data: { error: 'Error getting the user' } 
+        };
+    }
+  }
 }
 
 export default new UsersService();
